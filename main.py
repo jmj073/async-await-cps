@@ -5,13 +5,15 @@ class Future:
         self.__value = None
 
     def then(self, k):
-        if self.__resolved:
+        if self.is_resolved():
             k(self.__value)
         else:
             self.__callbacks.append(k)
         return self
 
     def resolve(self, v):
+        if self.is_resolved():
+            return
         self.__resolved = True
         self.__value = v
 
@@ -20,14 +22,14 @@ class Future:
 
     def is_resolved(self):
         return self.__resolved
-    
-    def try_get(self):
-        return self.__value
+
 
 def my_async(func):
     fut = Future()
     def k(v):
-        if not isinstance(v, Future):
+        if isinstance(v, Future):
+            v.then(fut.resolve)
+        else:
             fut.resolve(v)
     func(k)
     return fut
@@ -62,4 +64,3 @@ if __name__ == "__main__":
     print("resolve input")
     input_fut.resolve("world")
     print("resolved: ", fut.is_resolved())
-    print("get: ", fut.try_get())
