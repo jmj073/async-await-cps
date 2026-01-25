@@ -27,9 +27,7 @@ class Future:
 def my_async(func):
     fut = Future()
     def k(v):
-        if isinstance(v, Future):
-            v.then(fut.resolve)
-        else:
+        if not isinstance(v, Future):
             fut.resolve(v)
     func(k)
     return fut
