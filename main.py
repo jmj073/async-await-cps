@@ -26,14 +26,11 @@ class Future:
 
 def my_async(func):
     fut = Future()
-    def k(v):
-        if not isinstance(v, Future):
-            fut.resolve(v)
-    func(k)
+    func(fut.resolve)
     return fut
 
-def my_await(fut, ok, ik):
-    ok(fut.then(ik))
+def my_await(fut, k):
+    fut.then(k)
 
 
 input_fut = Future()
@@ -52,7 +49,7 @@ def foo(greet, k):
     def k1(v):
         print("await!")
         k(f"{greet}, {v}")
-    my_await(my_input(), k, k1)
+    my_await(my_input(), k1)
 
 if __name__ == "__main__":
     fut = my_async(lambda k: foo("Hello", k))
