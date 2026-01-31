@@ -9,6 +9,7 @@ class Future:
             k(self.__value)
         else:
             self.__callbacks.append(k)
+
         return self
 
     def resolve(self, v):
@@ -20,14 +21,18 @@ class Future:
         for k in self.__callbacks:
             k(v)
 
+        return self
+
     def is_resolved(self):
         return self.__resolved
 
 
-def my_async(func, *args):
-    fut = Future()
-    func(*args, fut.resolve)
-    return fut
+def my_async(func):
+    def async_func(*args):
+        fut = Future()
+        func(*args, fut.resolve)
+        return fut
+    return async_func
 
 def my_await(fut, k):
     fut.then(k)
@@ -44,6 +49,7 @@ async foo(greet):
     print("await!")
     return f"{greet}, {v}"
 """
+@my_async
 def foo(greet, k):
     print("enter!")
     def k1(v):
@@ -60,6 +66,7 @@ async fac(n):
     print("await!", n)
     return n * v
 """
+@my_async
 def fac(n, k):
     print("enter!", n)
     if n == 0:
@@ -68,10 +75,10 @@ def fac(n, k):
     def k1(v):
         print("await!", n)
         k(n * v)
-    my_await(my_async(fac, n - 1), k1)
+    my_await(fac(n - 1), k1)
 
 if __name__ == "__main__":
-    fut = my_async(foo, "Hello")
+    fut = foo("Hello")
 
     fut.then(lambda v: print("resolved!", v))
     print("resolved: ", fut.is_resolved())
@@ -81,5 +88,5 @@ if __name__ == "__main__":
 
     print("-" * 50)
 
-    fut = my_async(fac, 5)
+    fut = fac(5)
     fut.then(lambda v: print("resolved!", v))
