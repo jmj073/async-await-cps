@@ -14,7 +14,7 @@ class Future:
 
     def resolve(self, v):
         if self.is_resolved():
-            return
+            return self
         self.__resolved = True
         self.__value = v
 
