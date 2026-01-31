@@ -54,8 +54,8 @@ def foo(greet, k):
     print("enter!")
     def k1(v):
         print("await!")
-        k(f"{greet}, {v}")
-    my_await(my_input(), k1)
+        return k(f"{greet}, {v}")
+    return my_await(my_input(), k1)
 
 """
 async fac(n):
@@ -70,12 +70,11 @@ async fac(n):
 def fac(n, k):
     print("enter!", n)
     if n == 0:
-        k(1)
-        return
+        return k(1)
     def k1(v):
         print("await!", n)
-        k(n * v)
-    my_await(fac(n - 1), k1)
+        return k(n * v)
+    return my_await(fac(n - 1), k1)
 
 if __name__ == "__main__":
     fut = foo("Hello")
